@@ -1,0 +1,5 @@
+composer.phar
+*.old.php
+templates_c/
+vendor/
+
