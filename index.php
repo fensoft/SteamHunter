@@ -2,7 +2,7 @@
 require __DIR__ . '/vendor/autoload.php';
 
 # see https://steamcommunity.com/dev/apikey
-define("KEY", "FIXME");
+define("KEY", "4C04CA35153EE9660DB27D8D87A2FA0C");
 
 function getSteamApiAchievements($user, $appid, $language) {
   if (is_numeric($user)) {
@@ -42,9 +42,9 @@ function getSteamCommonAchievements($filter, $users, $appid, $language = "englis
 $smarty = new Smarty();
 $smarty->assign("request", $_REQUEST);
 $smarty->display("header.tpl");
-if (!isset($_REQUEST["user1"]))
+if (!isset($_REQUEST["user1"])) {
   $smarty->display("form.tpl");
-else {
+} else {
   $filter = array();
   if ($_REQUEST["filter"]) {
     $filter = explode(" ", $_REQUEST["filter"]);
@@ -58,7 +58,16 @@ else {
     array_push($users, $_REQUEST["user" . $i]);
     $i += 1;
   }
-  $results = getSteamCommonAchievements($filter, $users, $_REQUEST["appid"], $_REQUEST["language"], isset($_REQUEST["min"]) ? $_REQUEST["min"] : -1, isset($_REQUEST["max"]) ? $_REQUEST["max"] : -1);
+  $appid = $_REQUEST["appid"];
+  if (!is_numeric($appid)) {
+    $games = json_decode(file_get_contents("http://api.steampowered.com/ISteamApps/GetAppList/v2"), true);
+    $games = $games["applist"]["apps"];
+    foreach ($games as $key => $game) {
+      if (strtolower($appid) == strtolower($game["name"]))
+        $appid = $game["appid"];
+    }
+  }
+  $results = getSteamCommonAchievements($filter, $users, $appid, $_REQUEST["language"], isset($_REQUEST["min"]) ? $_REQUEST["min"] : -1, isset($_REQUEST["max"]) ? $_REQUEST["max"] : -1);
   $smarty->assign("results", $results);
   $smarty->display("results.tpl");
 }

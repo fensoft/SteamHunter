@@ -5,17 +5,16 @@ You will then have a report of all common achievements to do !<br/>
 
 <form action="?" method="get">
   <div class="form-group row">
+    <label for="inputPassword" class="col-sm-2 col-form-label">
+      <a href="https://steamdb.info/apps/" target="_blank">App ID</a> or game name
+    </label>
+    <div class="col-sm-10">
+      <input type="input" class="form-control" placeholder="AppID" name="appid" value="PAYDAY 2">
+    </div>
+
     {if !isset($request.advanced)}
       <div style="display: none">
     {/if}
-
-    <label for="inputPassword" class="col-sm-2 col-form-label">
-      <a href="https://steamdb.info/apps/" target="_blank">App ID</a>
-    </label>
-
-    <div class="col-sm-10">
-      <input type="input" class="form-control" placeholder="AppID" name="appid" value="218620">
-    </div>
 
     <label for="inputPassword" class="col-sm-2 col-form-label">Language</label>
     <div class="col-sm-10">
