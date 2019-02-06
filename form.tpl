@@ -59,4 +59,5 @@ You will then have a report of all common achievements to do !<br/>
   {/if}
 </form>
 
+Statistics: {$visits} visits, {$ips} visitors, {$appids} games, {$users} steamids
 <a href="https://github.com/fensoft/SteamHunter">fork me on github</a>

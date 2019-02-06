@@ -1,16 +1,18 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/config.php';
 
-# see https://steamcommunity.com/dev/apikey
-define("KEY", "4C04CA35153EE9660DB27D8D87A2FA0C");
-
-function getSteamApiAchievements($user, $appid, $language) {
+function getSteamId($user) {
   if (is_numeric($user)) {
     $userid = $user;
   } else {
     $vanity = json_decode(file_get_contents("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=" . KEY . "&vanityurl=" . $user));
     $userid = $vanity->response->steamid;
   }
+  return $userid;
+}
+
+function getSteamApiAchievements($userid, $appid, $language) {
   return json_decode(file_get_contents("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1?key=" . KEY . "&steamid=" . $userid . "&appid=" . $appid . "&l=" . $language));
 }
 
@@ -42,6 +44,17 @@ function getSteamCommonAchievements($filter, $users, $appid, $language = "englis
 $smarty = new Smarty();
 $smarty->assign("request", $_REQUEST);
 $smarty->display("header.tpl");
+$dbh = new PDO('mysql:host=' . MYSQL_HOSTNAME . ';dbname=' . MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD);
+$stats = array("visits" => "select count(*) as visits from stats_visits",
+               "ips"    => "select count(distinct ip) as ips from stats_visits",
+               "appids" => "select count(distinct appid) as appids from stats_visits",
+               "users"  => "select count(distinct steamid) as users from stats_users");
+foreach ($stats as $key => $query) {
+  $stmt = $dbh->prepare($query);
+  $stmt->execute();
+  $content = $stmt->fetch();
+  $smarty->assign($key, $content[$key]);
+}
 if (!isset($_REQUEST["user1"])) {
   $smarty->display("form.tpl");
 } else {
@@ -55,7 +68,7 @@ if (!isset($_REQUEST["user1"])) {
   $i = 1;
   $users = array();
   while (isset($_REQUEST["user" . $i]) && $_REQUEST["user" . $i] != "") {
-    array_push($users, $_REQUEST["user" . $i]);
+    array_push($users, getSteamId($_REQUEST["user" . $i]));
     $i += 1;
   }
   $appid = $_REQUEST["appid"];
@@ -68,6 +81,13 @@ if (!isset($_REQUEST["user1"])) {
     }
   }
   $results = getSteamCommonAchievements($filter, $users, $appid, $_REQUEST["language"], isset($_REQUEST["min"]) ? $_REQUEST["min"] : -1, isset($_REQUEST["max"]) ? $_REQUEST["max"] : -1);
+  $query = $dbh->prepare("INSERT INTO `stats_visits` (`ip`, `appid`, `language`, `filters`) VALUES (:ip, :appid, :language, :filter)");
+  $query->execute(array("ip" => $_SERVER['REMOTE_ADDR'], "appid" => $appid, "language" => $_REQUEST["language"], "filter" => json_encode($filter)));
+  $id = $dbh->lastInsertId();
+  $query = $dbh->prepare("INSERT INTO `stats_users` (`fk_stats_visits_id`, `steamid`) VALUES (:id, :steamid)");
+  foreach ($users as $key => $steamid) {
+    $query->execute(array("id" => $id, "steamid" => intval($steamid)));
+  }
   $smarty->assign("results", $results);
   $smarty->display("results.tpl");
 }

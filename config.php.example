@@ -1,0 +1,10 @@
+<?php
+
+# see https://steamcommunity.com/dev/apikey
+define("KEY",            "FIXME");
+
+define("MYSQL_HOSTNAME", "localhost");
+define("MYSQL_DATABASE", "FIXME");
+define("MYSQL_USER",     "FIXME");
+define("MYSQL_PASSWORD", "FIXME");
+
