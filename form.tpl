@@ -55,9 +55,9 @@ You will then have a report of all common achievements to do !<br/>
   </div>
   <button type="submit" class="btn btn-primary mb-2">Confirm</button>
   {if !isset($request.advanced)}
-    <a href="?advanced=1" class="btn btn-warning mb-2">Advanced</button>
+    <a href="?advanced=1" class="btn btn-warning mb-2">Advanced</a>
   {/if}
 </form>
 
-Statistics: {$visits} visits, {$ips} visitors, {$appids} games, {$users} steamids
+Statistics: {$visits} visits, {$ips} visitors, {$appids} games, {$users} steamids<br/>
 <a href="https://github.com/fensoft/SteamHunter">fork me on github</a>

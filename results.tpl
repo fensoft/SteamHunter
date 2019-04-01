@@ -1,6 +1,19 @@
-<a type="button" class="btn btn-danger" href="?">Back</a><div class="alert alert-primary" role="alert">
+{foreach $users_error as $key=>$value}
+  <div class="alert alert-danger" role="alert">
+    User {$value} not found
+  </div>
+{/foreach}
+
+{foreach $nogame as $key=>$value}
+  <div class="alert alert-danger" role="alert">
+    User {$value} do not have the game
+  </div>
+{/foreach}
+
+<div class="alert alert-primary" role="alert">
   There is {count($results)} achievements
 </div>
+
 <table class="table table-dark">
   <thead>
     <tr>
