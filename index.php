@@ -2,22 +2,60 @@
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/config.php';
 
+function array_group_by(array $arr, callable $key_selector) {
+  $result = array();
+  foreach ($arr as $i) {
+    $key = call_user_func($key_selector, $i);
+    $result[$key][] = $i;
+  }  
+  return $result;
+}
+
+function getCachedContents($url) {
+  $success = false;
+  $result = apcu_fetch($url, $success);
+  if (!$success) {
+    $result = file_get_contents($url);
+    apcu_store($url, $result, 180);
+  }
+  return $result;
+}
+
+function getAppId($appid) {
+  $found = false;
+  $games = json_decode(getCachedContents("http://api.steampowered.com/ISteamApps/GetAppList/v2"), true);
+  $games = $games["applist"]["apps"];
+  if (!is_numeric($appid)) {
+    foreach ($games as $key => $game) {
+      if (strtolower($appid) == strtolower($game["name"])) {
+        $appid = $game["appid"];
+        $found = true;
+      }
+    }
+  }
+  return $appid;
+}
+
 function getSteamId($user) {
   if (is_numeric($user)) {
     $userid = $user;
   } else {
-    $vanity = json_decode(file_get_contents("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=" . KEY . "&vanityurl=" . $user));
+    $vanity = json_decode(getCachedContents("http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=" . KEY . "&vanityurl=" . $user));
     $userid = $vanity->response->steamid;
   }
   return $userid;
 }
 
 function getSteamApiAchievements($userid, $appid, $language) {
-  return json_decode(file_get_contents("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1?key=" . KEY . "&steamid=" . $userid . "&appid=" . $appid . "&l=" . $language));
+  return json_decode(getCachedContents("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1?key=" . KEY . "&steamid=" . $userid . "&appid=" . $appid . "&l=" . $language));
+}
+
+function getSteamApiStats($userid, $appid) {
+  return json_decode(getCachedContents("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?key=" . KEY . "&steamid=" . $userid . "&appid=" . $appid));
 }
 
 function getSteamProfile($userid) {
-  return json_decode(file_get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" . KEY . "&steamids=" . $userid))->response->players[0];
+  return json_decode(getCachedContents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" . KEY . "&steamids=" . $userid))->response->players[0];
 }
 
 function getSteamCommonAchievements($filter, $users, $appid, $language = "english", $min = -1, $max = -1) {
@@ -50,9 +88,11 @@ function getSteamCommonAchievements($filter, $users, $appid, $language = "englis
   return array("result" => $final, "nogame" => $nogame);
 }
 
-$smarty = new Smarty();
-$smarty->assign("request", $_REQUEST);
-$smarty->display("header.tpl");
+if (!isset($_REQUEST['api'])) {
+  $smarty = new Smarty();
+  $smarty->assign("request", $_REQUEST);
+  $smarty->display("header.tpl");
+}
 $dbh = new PDO('mysql:host=' . MYSQL_HOSTNAME . ';dbname=' . MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD);
 $stats = array("visits" => "select count(*) as visits from stats_visits",
                "ips"    => "select count(distinct ip) as ips from stats_visits",
@@ -62,11 +102,31 @@ foreach ($stats as $key => $query) {
   $stmt = $dbh->prepare($query);
   $stmt->execute();
   $content = $stmt->fetch();
-  $smarty->assign($key, $content[$key]);
+  if (!isset($_REQUEST['api']))
+    $smarty->assign($key, $content[$key]);
 }
-if (!isset($_REQUEST["user1"])) {
-  $smarty->display("form.tpl");
-} else {
+$action = $_REQUEST["action"];
+if ($action == '')
+  $action = 'menu';
+
+if ($action == 'results-scan') {
+  $appid = getAppId($_REQUEST["appid"]);
+  $ach = getSteamApiAchievements(getSteamId($_REQUEST["user"]), $appid, $_REQUEST["language"]);
+  include_once "scan/" . basename($appid) . ".php";
+  $result = scan($ach->playerstats->achievements);
+  if (isset($_REQUEST['api']) && $_REQUEST['api'] == 'json')
+    echo json_encode($result, JSON_PRETTY_PRINT);
+  else
+    $smarty->assign("results", $result);
+}
+
+if ($action == 'results-stats') {
+  $appid = getAppId($_REQUEST["appid"]);
+  $json = getSteamApiStats(getSteamId($_REQUEST["user"]), $appid);
+  $smarty->assign("results", $json);
+}
+
+if ($action == 'results-common') {
   $filter = array();
   if ($_REQUEST["filter"]) {
     $filter = explode(" ", $_REQUEST["filter"]);
@@ -87,7 +147,7 @@ if (!isset($_REQUEST["user1"])) {
   }
   $appid = $_REQUEST["appid"];
   $found = false;
-  $games = json_decode(file_get_contents("http://api.steampowered.com/ISteamApps/GetAppList/v2"), true);
+  $games = json_decode(getCachedContents("http://api.steampowered.com/ISteamApps/GetAppList/v2"), true);
   $games = $games["applist"]["apps"];
   if (!is_numeric($appid)) {
     foreach ($games as $key => $game) {
@@ -101,7 +161,7 @@ if (!isset($_REQUEST["user1"])) {
       $found = true;
   }
   if ($found == false) {
-    $smarty->display("appid_not_found.tpl");
+    $action = "appid_not_found.tpl";
   } else {
     $results = getSteamCommonAchievements($filter, $users, $appid, $_REQUEST["language"], isset($_REQUEST["min"]) ? $_REQUEST["min"] : -1, isset($_REQUEST["max"]) ? $_REQUEST["max"] : -1);
     $query = $dbh->prepare("INSERT INTO `stats_visits` (`ip`, `appid`, `language`, `filters`) VALUES (:ip, :appid, :language, :filter)");
@@ -114,7 +174,9 @@ if (!isset($_REQUEST["user1"])) {
     $smarty->assign("results", $results["result"]);
     $smarty->assign("nogame", $results["nogame"]);
     $smarty->assign("users_error", $users_error);
-    $smarty->display("results.tpl");
   }
 }
-$smarty->display("footer.tpl");
+if (!isset($_REQUEST['api'])) {
+  $smarty->display(basename($action) . ".tpl");
+  $smarty->display("footer.tpl");
+}

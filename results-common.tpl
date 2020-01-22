@@ -18,6 +18,7 @@
   <thead>
     <tr>
       <th scope="col">#</th>
+      <th scope="col">ID</th>
       <th scope="col">Name</th>
       <th scope="col">Description</th>
     </tr>
@@ -26,6 +27,7 @@
   {foreach $results as $key=>$value}
     <tr apiname="{$value->apiname}">
       <td>{$value->total}</td>
+      <td style="font-size: 50%;">{$value->apiname}</td>
       <td>{$value->name}</td>
       <td>{$value->description}</td>
     </tr>

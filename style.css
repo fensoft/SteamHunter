@@ -1,0 +1,21 @@
+body {
+  background-color: #212529;
+}
+
+.cheat-warning-odd {
+  background-color: orange;
+}
+
+.cheat-warning-even {
+  background-color: coral;
+}
+
+.cheat-infamy-odd {
+  background-color: red;
+}
+.cheat-infamy-even {
+  background-color: red;
+}
+.modal {
+  color: black;
+}

@@ -4,6 +4,7 @@ You will then have a report of all common achievements to do !<br/>
 <br/>
 
 <form action="?" method="get">
+  <input name="action" type="hidden" value="results-common">
   <div class="form-group row">
     <label for="inputPassword" class="col-sm-2 col-form-label">
       <a href="https://steamdb.info/apps/" target="_blank">App ID</a> or game name
@@ -53,11 +54,8 @@ You will then have a report of all common achievements to do !<br/>
       </div>
     {/for}
   </div>
-  <button type="submit" class="btn btn-primary mb-2">Confirm</button>
+  <button type="submit" class="btn btn-primary mb-2">Show common achievements</button>
   {if !isset($request.advanced)}
     <a href="?advanced=1" class="btn btn-warning mb-2">Advanced</a>
   {/if}
 </form>
-
-Statistics: {$visits} visits, {$ips} visitors, {$appids} games, {$users} steamids<br/>
-<a href="https://github.com/fensoft/SteamHunter">fork me on github</a>
