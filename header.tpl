@@ -15,6 +15,11 @@
           <li class="nav-item active">
             <a class="nav-link" href="?">Home <span class="sr-only">(current)</span></a>
           </li>
+          {if isset($smarty.request.appid) and isset($smarty.request.language) and isset($smarty.request.user)}
+            <li class="nav-item {if $smarty.request.action == 'results-scan-history'}active{/if}">
+              <a class="nav-link" href="?action=results-scan-history&appid={$smarty.request.appid|appid}&language={$smarty.request.language}&user={$smarty.request.user|steamid}">History <span class="sr-only">(current)</span></a>
+            </li>
+          {/if}
         </ul>
       </div>
     </nav>

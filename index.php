@@ -7,23 +7,29 @@ function array_group_by(array $arr, callable $key_selector) {
   foreach ($arr as $i) {
     $key = call_user_func($key_selector, $i);
     $result[$key][] = $i;
-  }  
+  }
   return $result;
 }
 
-function getCachedContents($url) {
+function getCachedContents($url, $time = 30, $minsize = 1) {
   $success = false;
   $result = apcu_fetch($url, $success);
-  if (!$success) {
-    $result = file_get_contents($url);
-    apcu_store($url, $result, 180);
+  if (!$success || $result == "" || strlen($result) < $minsize) {
+    $opts = array('http' => array('ignore_errors' => true));
+    $context = stream_context_create($opts);
+    $result = file_get_contents($url, false, $context);
+    if ($result != "")
+      apcu_store($url, $result, $time);
+    //echo "<!--" . $url . "=" . strlen($result) . $result . "-->";
+  } else {
+    //echo "<!--" . $url . "= cachehit" . strlen($result) . $result . "-->\n";
   }
   return $result;
 }
 
 function getAppId($appid) {
   $found = false;
-  $games = json_decode(getCachedContents("http://api.steampowered.com/ISteamApps/GetAppList/v2"), true);
+  $games = json_decode(getCachedContents("http://api.steampowered.com/ISteamApps/GetAppList/v2", 3600, 1024), true);
   $games = $games["applist"]["apps"];
   if (!is_numeric($appid)) {
     foreach ($games as $key => $game) {
@@ -47,7 +53,17 @@ function getSteamId($user) {
 }
 
 function getSteamApiAchievements($userid, $appid, $language) {
-  return json_decode(getCachedContents("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1?key=" . KEY . "&steamid=" . $userid . "&appid=" . $appid . "&l=" . $language));
+  if (isset($_REQUEST["snapshot"])) {
+    return json_decode(gzdecode(file_get_contents("history/$appid/$userid/" . $_REQUEST["snapshot"] . "." . $language)));
+  } else {
+    $content = getCachedContents("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1?key=" . KEY . "&steamid=" . $userid . "&appid=" . $appid . "&l=" . $language);
+    header("X-FenAchievements: " . $_SERVER["REQUEST_TIME"]);
+    $folder = "history/$appid/$userid";
+    if (!is_dir($folder))
+      mkdir($folder, 0777, TRUE);
+    file_put_contents($folder . "/" . $_SERVER["REQUEST_TIME"] . "." . $language, gzencode($content, 9));
+    return json_decode($content);
+  }
 }
 
 function getSteamApiStats($userid, $appid) {
@@ -88,8 +104,15 @@ function getSteamCommonAchievements($filter, $users, $appid, $language = "englis
   return array("result" => $final, "nogame" => $nogame);
 }
 
+function sanitize($dangerous_filename) {
+  $dangerous_characters = array(" ", '"', "'", "&", "/", "\\", "?", "#");
+  return str_replace($dangerous_characters, '_', $dangerous_filename);
+}
+
 if (!isset($_REQUEST['api'])) {
   $smarty = new Smarty();
+  $smarty->registerPlugin("modifier", "appid", "getAppId");
+  $smarty->registerPlugin("modifier", "steamid", "getSteamId");
   $smarty->assign("request", $_REQUEST);
   $smarty->display("header.tpl");
 }
@@ -112,6 +135,9 @@ if ($action == '')
 if ($action == 'results-scan') {
   $appid = getAppId($_REQUEST["appid"]);
   $ach = getSteamApiAchievements(getSteamId($_REQUEST["user"]), $appid, $_REQUEST["language"]);
+  if ($ach->playerstats->success === false) {
+    die($ach->playerstats->error);
+  }
   include_once "scan/" . basename($appid) . ".php";
   $result = scan($ach->playerstats->achievements);
   if (isset($_REQUEST['api']) && $_REQUEST['api'] == 'json')
@@ -119,7 +145,18 @@ if ($action == 'results-scan') {
   else
     $smarty->assign("results", $result);
 }
-
+if ($action == 'results-scan-history') {
+  $dir = "history/" . sanitize($_REQUEST["appid"]) . "/" . sanitize($_REQUEST["user"]);
+  if (!is_dir($dir))
+    die("No history");
+  $history = array_diff(scandir($dir), array('..', '.'));
+  $hist = array();
+  foreach ($history as $val) {
+    $split = explode(".", $val);
+    array_push($hist, array("time" => $split[0], "language" => $split[1]));
+  }
+  $smarty->assign("history", $hist);
+}
 if ($action == 'results-stats') {
   $appid = getAppId($_REQUEST["appid"]);
   $json = getSteamApiStats(getSteamId($_REQUEST["user"]), $appid);
@@ -145,22 +182,8 @@ if ($action == 'results-common') {
       array_push($users_error, $_REQUEST["user" . $i]);
     $i += 1;
   }
-  $appid = $_REQUEST["appid"];
-  $found = false;
-  $games = json_decode(getCachedContents("http://api.steampowered.com/ISteamApps/GetAppList/v2"), true);
-  $games = $games["applist"]["apps"];
-  if (!is_numeric($appid)) {
-    foreach ($games as $key => $game) {
-      if (strtolower($appid) == strtolower($game["name"])) {
-        $appid = $game["appid"];
-        $found = true;
-      }
-    }
-  } else {
-    if ($game["appid"] == $appid)
-      $found = true;
-  }
-  if ($found == false) {
+  $appid = getAppId($_REQUEST["appid"]);
+  if (!ctype_digit($appid)) {
     $action = "appid_not_found.tpl";
   } else {
     $results = getSteamCommonAchievements($filter, $users, $appid, $_REQUEST["language"], isset($_REQUEST["min"]) ? $_REQUEST["min"] : -1, isset($_REQUEST["max"]) ? $_REQUEST["max"] : -1);

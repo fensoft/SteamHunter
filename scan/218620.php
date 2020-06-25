@@ -13,7 +13,7 @@ function filter($in, $out) {
 function scan($ach) {
   $res = array();
   $odd = false;
-  
+
   $whitelist = array();
   $structure = json_decode(file_get_contents("scan/218620.json"));
   if (json_last_error()) {
@@ -95,7 +95,7 @@ function scan($ach) {
           }
         }
       }
-      
+
       if (count($dup) > 1)
         array_push($dupes, array("owner" => $_REQUEST["user"], "type" => "whitelist_dupe", "content" => $dup));
     }

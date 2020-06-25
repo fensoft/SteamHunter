@@ -1,4 +1,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.1/css/theme.blue.css">
+<script src="https://use.fontawesome.com/dfe10e7ba6.js"></script>
+  {if isset($smarty.request.snapshot)}
+    <center style="background: red;">You are looking achievements of {$smarty.request.snapshot|date_format:"%d/%m/%y %H:%M:%S"} <a href="?action={$smarty.request.action}&appid={$smarty.request.appid}&language={$smarty.request.language}&user={$smarty.request.user}">See now</a></center>
+  {/if}
 <table class="table table-dark tablesorter">
   <thead>
     <tr>
@@ -10,7 +14,7 @@
   </thead>
   <tbody>
   {foreach $results as $key=>$value}
-    <tr apiname="{$value->apiname}" class="{$value->class}">
+    <tr apiname="{$value->apiname}" {if isset($value->class)}class="{$value->class}"{/if}>
       <td style="font-size: 50%;">
         {if isset($value->code)}
           <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#{$value->apiname}">#</button>
@@ -37,7 +41,7 @@
           </div>
         {/if}
       </td>
-      <td>{$value->unlocktime|date_format:"%d/%m/%y %H:%M:%S"}</td>
+      <td>{if $value->unlocktime == 0}<i class="fa fa-lock"></i>{else}{$value->unlocktime|date_format:"%d/%m/%y %H:%M:%S"}{/if}</td>
       <td>{$value->name}</td>
       <td>{$value->description}</td>
     </tr>
