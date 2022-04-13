@@ -1,7 +1,9 @@
 [
-   {"type":"timed_order","time":"15","class":"cheat-infamy","after":"07/04/2017 12:00:00","content":["ignominy_1","ignominy_2","ignominy_3","ignominy_4","ignominy_5","ignominy_6","ignominy_7","ignominy_8","ignominy_9","ignominy_10","ignominy_11","ignominy_12","ignominy_13","ignominy_14","ignominy_15","ignominy_16","ignominy_17","ignominy_18","ignominy_19","ignominy_20","ignominy_21","ignominy_22","ignominy_23","ignominy_24","ignominy_25"]}
-  ,{"type":"timed_order","time":"21600","class":"cheat-infamy","before":"07/04/2017 12:00:00","content":["ignominy_1","ignominy_2","ignominy_3","ignominy_4","ignominy_5","ignominy_6","ignominy_7","ignominy_8","ignominy_9","ignominy_10","ignominy_11","ignominy_12","ignominy_13","ignominy_14","ignominy_15"]}
-  ,{"type":"timed_order","time":"10800","class":"cheat-infamy","before":"07/04/2017 12:00:00","content":["ignominy_15","ignominy_16","ignominy_17","ignominy_18","ignominy_19","ignominy_20","ignominy_21","ignominy_22","ignominy_23","ignominy_24","ignominy_25"]}
+	{"type":"timed_order","time":"10","class":"cheat-infamy","after":"07/04/2017 12:00:00", "before":"11/11/2020 12:00:00", "content":["ignominy_1","ignominy_2","ignominy_3","ignominy_4","ignominy_5","ignominy_6","ignominy_7","ignominy_8","ignominy_9","ignominy_10","ignominy_11","ignominy_12","ignominy_13","ignominy_14","ignominy_15","ignominy_16","ignominy_17","ignominy_18","ignominy_19","ignominy_20","ignominy_21","ignominy_22","ignominy_23","ignominy_24","ignominy_25"]}
+	,{"type":"timed_order","time":"1800","class":"cheat-infamy","after":"11/11/2020 12:00:00","content":["ignominy_1","ignominy_2","ignominy_3","ignominy_4","ignominy_5","ignominy_6","ignominy_7","ignominy_8","ignominy_9","ignominy_10","ignominy_11","ignominy_12","ignominy_13","ignominy_14","ignominy_15","ignominy_16","ignominy_17","ignominy_18","ignominy_19","ignominy_20","ignominy_21","ignominy_22","ignominy_23","ignominy_24","ignominy_25"]}
+	,{"type":"timed_order","time":"3600","class":"cheat-infamy","before":"07/04/2017 12:00:00","content":["ignominy_1","ignominy_2","ignominy_3","ignominy_4","ignominy_5"]}
+	,{"type":"timed_order","time":"1800","class":"cheat-infamy","before":"07/04/2017 12:00:00","content":["ignominy_6","ignominy_7","ignominy_8","ignominy_9","ignominy_10","ignominy_11","ignominy_12","ignominy_13","ignominy_14","ignominy_15"]}
+	,{"type":"timed_order","time":"1800","class":"cheat-infamy","before":"07/04/2017 12:00:00","content":["ignominy_15","ignominy_16","ignominy_17","ignominy_18","ignominy_19","ignominy_20","ignominy_21","ignominy_22","ignominy_23","ignominy_24","ignominy_25"]}
 	,{"owner":"CelShield","type":"whitelist_dupe","content":["trk_af_0","trk_af_1","trk_af_2","trk_af_3","pick_45","sinus_2","ggez_15","axe_45"]}
 	,{"owner":"tamikara","type":"whitelist_dupe","content":["wwh_1","wwh_2","wwh_3","wwh_4","wwh_5","wwh_6","ggez_16","wwh_7"]}
 	,{"owner":"CelShield","type":"whitelist_dupe","content":["trk_al_0","trk_al_1","trk_al_2","trk_al_3","pick_43","live_1","ggez_17","axe_43"]}
@@ -93,17 +95,21 @@
 	,{"owner":"ALL CONTRACT DIFFICULT","type":"whitelist_dupe","content":["trk_a_0","death_27","death_28","death_29","pick_66","death_30","axe_66","ggez_1"]}
 	,{"owner":"package","type":"whitelist_dupe","content":["gmod_5","gmod_6"]}
 	,{"owner":"russian","type":"whitelist_dupe","content":["grv_1","grv_4"]}
-
-
-
-
-
-
-
-
-
-
-
-
+	,{"owner":"san martin","type":"whitelist_dupe","content":["bex_1","bex_2","bex_3","bex_4","bex_5","bex_6","bex_7","bex_8"]}
+	,{"owner":"buluc","type":"whitelist_dupe","content":["fex_1","fex_2","fex_3","fex_4","fex_5","fex_6","fex_7","fex_8"]}
+	,{"owner":"tijuana","type":"whitelist_dupe","content":["pex_1","pex_2","pex_3","pex_4","pex_5","pex_6","pex_7","pex_8"]}
+	,{"owner":"Holdout_goldengrin_kristoferlegeek","type":"whitelist_dupe","content":["skm_1","skm_2","skm_3","skm_4"]}
+	,{"owner":"Holdout_diamond_kristoferlegeek","type":"whitelist_dupe","content":["skm_29","skm_30","skm_31","skm_32"]}
+	,{"owner":"HoldOut_HeatStreat_kristoferlegeek","type":"whitelist_dupe","content":["skm_25","skm_26","skm_27","skm_28"]}
+	,{"owner":"Holdout_boatload_kristoferlegeek","type":"whitelist_dupe","content":["skm_17","skm_18","skm_19","skm_20"]}
+	,{"owner":"Holdout_alesso_kristoferlegeek","type":"whitelist_dupe","content":["skm_13","skm_14","skm_15","skm_16"]}
+	,{"owner":"Holdout_bigbank_kristoferlegeek","type":"whitelist_dupe","content":["skm_5","skm_6","skm_7","skm_8"]}
+	,{"owner":"Holdout_SanMartins_kristoferlegeek","type":"whitelist_dupe","content":["skm_33","skm_34","skm_35","skm_36"]}
+	,{"owner":"Holdout_FirstWorldBank_kristoferlegeek","type":"whitelist_dupe","content":["skm_21","skm_22","skm_23","skm_24"]}
+	,{"owner":"4_sucess_bigbank_kristoferlegeek","type":"whitelist_dupe","content":["bigbank_3","bigbank_4","bigbank_5","bigbank_7"]}
+	,{"owner":"Holdout_vandale_kristoferlegeek","type":"whitelist_dupe","content":["skm_9","skm_10","skm_11","skm_12"]}
+	,{"owner":"dragon_difficult","type":"whitelist_dupe","content":["chas_1","chas_2","chas_3","chas_4","chas_5","chas_6","chas_7","chas_8"]}
+	,{"owner":"ukrainian prisoner","type":"whitelist_dupe","content":["sand_1","sand_2","sand_3","sand_4","sand_5","sand_6","sand_7","sand_8"]}
+	,{"owner":"black cat","type":"whitelist_dupe","content":["chca_1","chca_2","chca_3","chca_4","chca_5","chca_6","chca_7","chca_8"]}
 
 ]
