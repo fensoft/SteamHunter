@@ -4,3 +4,9 @@ templates_c/
 vendor/
 config.php
 history
+.htaccess
+*.swp
+*.save
+webgrind
+.well-known/
+dev/

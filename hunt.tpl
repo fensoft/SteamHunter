@@ -56,6 +56,6 @@ You will then have a report of all common achievements to do !<br/>
   </div>
   <button type="submit" class="btn btn-primary mb-2">Show common achievements</button>
   {if !isset($request.advanced)}
-    <a href="?advanced=1" class="btn btn-warning mb-2">Advanced</a>
+    <a href="?action=hunt&advanced=1" class="btn btn-warning mb-2">Advanced</a>
   {/if}
 </form>
