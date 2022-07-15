@@ -8,3 +8,7 @@ define("MYSQL_DATABASE", "FIXME");
 define("MYSQL_USER",     "FIXME");
 define("MYSQL_PASSWORD", "FIXME");
 
+define("MONGODB_HOSTNAME", "FIXME");
+define("MONGODB_PORT",     "FIXME");
+define("MONGODB_USERNAME", "FIXME");
+define("MONGODB_PASSWORD", "FIXME");

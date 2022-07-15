@@ -173,7 +173,7 @@ function ksortRecursive(&$array, $sort_flags = SORT_REGULAR) {
 function getMongoStats($steamid, $appid) {
   $data = getSteamApiUserInfo($steamid, $appid);
   $data["playtime"] = getSteamApiPlaytime(getSteamId($_REQUEST["user"]), $appid);
-  $client = new MongoDB\Client("mongodb://" . MONGODB_USERNAME . ":" . MONGODB_PASSWORD . "@" .MONGODB_HOSTNAME .  ":" . MONGODB_PORT);
+  $client = new MongoDB\Client("mongodb://" . MONGODB_USERNAME . ":" . MONGODB_PASSWORD . "@" . MONGODB_HOSTNAME .  ":" . MONGODB_PORT);
   $collection = $client->payday2->stats;
   $result = $collection->find(['steamid' => intVal($steamid)], ['sort' => ['time' => -1], 'limit' => 1]);
   $result->setTypeMap(array('array' => 'array', 'document' => 'array', 'root' => 'array'));
